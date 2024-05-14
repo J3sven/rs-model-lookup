@@ -78,7 +78,7 @@
     </div>
     <div class="container">
       <form>
-        <label for="data-file">Data File:</label>
+        <label for="data-file">Data source:</label>
         <select id="data-file" name="data-file" required>
             <option value="">Select File</option>
             <option value="554-npc">554-npc</option>
@@ -155,12 +155,16 @@
 
         function displayData(data) {
           let output = "";
-          data.forEach(item => {
-            output += `<tr>
-                    <td>${item.index}</td>
-                    <td>${item.label}</td>
-                </tr>`;
-          });
+          if (data.length === 0) {
+            output = "<tr><td colspan='2'>No results found, perhaps try a different data source</td></tr>";
+          } else {
+            data.forEach(item => {
+              output += `<tr>
+                <td>${item.index}</td>
+                <td>${item.label}</td>
+            </tr>`;
+            });
+          }
           resultsBody.innerHTML = output;
         }
 

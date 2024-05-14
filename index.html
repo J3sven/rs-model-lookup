@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Runescape Model Search</title>
+    <style>
+      /* Global styles */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+      }
+      body {
+        background-color: #212529;
+        color: #fff;
+      }
+      .container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 1rem;
+        background-color: #343a40;
+        border-radius: 10px;
+      }
+      /* Form styles */
+      form {
+        display: flex;
+        gap: 1rem; /* Maintain gap between elements */
+        padding: 1rem; /* Add padding to the form */
+      }
+      label {
+        flex-shrink: 0; /* Prevent label from shrinking */
+        margin-right: 0.5rem; /* Add some space between label and select */
+        text-align: right;
+        line-height: 2.5em; /* Vertically center label with select menu */
+      }
+      select,
+        input[type="text"] {
+        padding: 0.5em;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        width: 100%;
+      }
+      button {
+        padding: 0.5em 1em;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      /* Table styles */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 0.5em;
+        border: 1px solid #444;
+        text-align: left;
+      }
+      th {
+         background-color: #29323a;
+      }
+      .header {
+        background-color: #343a40;
+        color: white;
+        text-align: center;
+        padding: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>RSHD Model Search</h1>
+    </div>
+    <div class="container">
+      <form>
+        <label for="revision">Revision:</label>
+        <select id="revision" name="revision" required>
+          <option value="">Select Revision</option>
+          <option value="554">554</option>
+          <option value="592">592</option>
+          <option value="643">643</option>
+          <option value="718">718</option>
+          <option value="910">910</option>
+        </select>
+        <label for="type">Type:</label>
+        <select id="type" name="type" required>
+          <option value="">Select Type</option>
+          <option value="obj">obj</option>
+          <option value="item">item</option>
+          <option value="npc">npc</option>
+          <option value="gfx">gfx</option>
+        </select>
+        <label for="search-box">Search:</label>
+        <input type="text" id="search-box" placeholder="Search models">
+        <button type="submit">Search</button>
+      </form>
+      <div class="results">
+        <table>
+          <thead>
+            <tr>
+              <th>Index</th>
+              <th>Label</th>
+            </tr>
+          </thead>
+          <tbody id="results-body"></tbody>
+        </table>
+      </div>
+      <script>
+        const searchForm = document.querySelector("form");
+        const resultsBody = document.getElementById("results-body");
+        const searchBox = document.getElementById("search-box");
+
+        searchForm.addEventListener("submit", (event) => {
+          event.preventDefault(); // Prevent default form submission
+
+          const revision = document.getElementById("revision").value;
+          const type = document.getElementById("type").value;
+          const searchTerm = searchBox.value.toLowerCase(); // Convert search term to lowercase
+
+          if (!revision || !type) {
+            alert("Please select both revision and type.");
+            return;
+          }
+
+          const filename = `data/${revision}-${type}.json`; // Construct filename based on selection
+          fetch(filename)
+            .then(response => response.json())
+            .then(data => {
+              const results = fuzzySearch(searchTerm, data);
+              displayData(results);
+            })
+            .catch(error => {
+              console.error("Error fetching data:", error);
+              alert("Failed to retrieve data. Please check revision and type.");
+            });
+        });
+
+        // Fuzzy search function (replace with your preferred library)
+        function fuzzySearch(searchTerm, data) {
+          // Implement your fuzzy search logic here
+          // This is a basic example using string search
+          // Replace with a fuzzy search library like Fuse.js
+          return data.filter(item => item.label.toLowerCase().includes(searchTerm));
+        }
+
+        function displayData(data) {
+          let output = "";
+          data.forEach(item => {
+            output += `<tr>
+                    <td>${item.index}</td>
+                    <td>${item.label}</td>
+                </tr>`;
+          });
+          resultsBody.innerHTML = output;
+        }
+
+        // Function to create and display the modal popup
+        function showCopySuccessModal(indexValue) {
+          const modal = document.createElement("div");
+          modal.classList.add("copy-success-modal");
+          modal.textContent = `Index ${indexValue} Copied!`;
+          document.body.appendChild(modal);
+
+          // Automatically remove the modal after 2 seconds
+          setTimeout(() => {
+            modal.remove();
+          }, 2000);
+        }
+
+        resultsBody.addEventListener("click", (event) => {
+          const target = event.target;
+          if (target.tagName !== "TD") return; // Check if clicked element is a table cell (TD)
+
+          // Get the index value from the cell content
+          const indexValue = target.textContent;
+
+          // Use the Clipboard API to copy the index value
+          navigator.clipboard.writeText(indexValue)
+            .then(() => { // No argument needed here
+              showCopySuccessModal(indexValue);
+            })
+            .catch(err => {
+              console.error("Failed to copy index:", err);
+            });
+
+        });
+
+        // Style the modal (optional)
+        const style = document.createElement("style");
+        style.textContent = `.copy-success-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #2ECC71;
+        color: white;
+        padding: 1rem;
+        border-radius: 5px;
+        font-size: 1.2rem;
+        z-index: 999; /* Ensure modal appears above other elements */
+        }`;
+        document.head.appendChild(style);
+      </script>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,106 @@
+[
+  {
+    "value": "554-npc",
+    "label": "554-npc"
+  },
+  {
+    "value": "554-obj",
+    "label": "554-obj"
+  },
+  {
+    "value": "592-npc",
+    "label": "592-npc"
+  },
+  {
+    "value": "592-obj",
+    "label": "592-obj"
+  },
+  {
+    "value": "643-item",
+    "label": "643-item"
+  },
+  {
+    "value": "643-npc",
+    "label": "643-npc"
+  },
+  {
+    "value": "643-obj",
+    "label": "643-obj"
+  },
+  {
+    "value": "718-item",
+    "label": "718-item"
+  },
+  {
+    "value": "718-obj",
+    "label": "718-obj"
+  },
+  {
+    "value": "910-item",
+    "label": "910-item"
+  },
+  {
+    "value": "910-obj",
+    "label": "910-obj"
+  },
+  {
+    "value": "hd-item",
+    "label": "hd-item"
+  },
+  {
+    "value": "hd-npc",
+    "label": "hd-npc"
+  },
+  {
+    "value": "hd-obj",
+    "label": "hd-obj"
+  },
+  {
+    "value": "os-item-219",
+    "label": "os-item-219"
+  },
+  {
+    "value": "os-item-220",
+    "label": "os-item-220"
+  },
+  {
+    "value": "os-item-221",
+    "label": "os-item-221"
+  },
+  {
+    "value": "os-item-233",
+    "label": "os-item-233"
+  },
+  {
+    "value": "os-npc-219",
+    "label": "os-npc-219"
+  },
+  {
+    "value": "os-npc-220",
+    "label": "os-npc-220"
+  },
+  {
+    "value": "os-npc-221",
+    "label": "os-npc-221"
+  },
+  {
+    "value": "os-npc-233",
+    "label": "os-npc-233"
+  },
+  {
+    "value": "os-obj-219",
+    "label": "os-obj-219"
+  },
+  {
+    "value": "os-obj-220",
+    "label": "os-obj-220"
+  },
+  {
+    "value": "os-obj-221",
+    "label": "os-obj-221"
+  },
+  {
+    "value": "os-obj-233",
+    "label": "os-obj-233"
+  }
+]

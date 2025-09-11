@@ -50,6 +50,11 @@
         border-radius: 5px;
         cursor: pointer;
       }
+      /* Loading indicator */
+      .loading {
+        color: #ffc107;
+        font-style: italic;
+      }
       /* Table styles */
       table {
         width: 100%;
@@ -79,30 +84,7 @@
     <div class="container">
       <form>
         <select id="data-file" name="data-file" required>
-          <option value="">Select data source</option>
-          <option value="554-npc">554-npc</option>
-          <option value="554-obj">554-obj</option>
-          <option value="592-npc">592-npc</option>
-          <option value="592-obj">592-obj</option>
-          <option value="643-item">643-item</option>
-          <option value="643-npc">643-npc</option>
-          <option value="643-obj">643-obj</option>
-          <option value="718-item">718-item</option>
-          <option value="718-obj">718-obj</option>
-          <option value="910-item">910-item</option>
-          <option value="910-obj">910-obj</option>
-          <option value="hd-item">hd-item</option>
-          <option value="hd-npc">hd-npc</option>
-          <option value="hd-obj">hd-obj</option>
-          <option value="os-item-219">os-item-219</option>
-          <option value="os-item-220">os-item-220</option>
-          <option value="os-item-221">os-item-221</option>
-          <option value="os-npc-219">os-npc-219</option>
-          <option value="os-npc-220">os-npc-220</option>
-          <option value="os-npc-221">os-npc-221</option>
-          <option value="os-obj-219">os-obj-219</option>
-          <option value="os-obj-220">os-obj-220</option>
-          <option value="os-obj-221">os-obj-221</option>
+          <option value="">Loading data sources...</option>
         </select>
         <input type="text" id="search-box" placeholder="Search models">
         <button type="submit">Search</button>
@@ -122,12 +104,38 @@
         const searchForm = document.querySelector("form");
         const resultsBody = document.getElementById("results-body");
         const searchBox = document.getElementById("search-box");
+        const dataFileSelect = document.getElementById("data-file");
+
+        // Load available data sources on page load
+        document.addEventListener('DOMContentLoaded', loadDataSources);
+
+        async function loadDataSources() {
+          try {
+            // Fetch the index file that contains list of available data files
+            const response = await fetch('data/index.json');
+            const dataSources = await response.json();
+            
+            // Clear the loading option
+            dataFileSelect.innerHTML = '<option value="">Select data source</option>';
+            
+            // Populate dropdown with available data sources
+            dataSources.forEach(source => {
+              const option = document.createElement('option');
+              option.value = source.value;
+              option.textContent = source.label || source.value;
+              dataFileSelect.appendChild(option);
+            });
+            
+          } catch (error) {
+            console.error('Error loading data sources:', error);
+            dataFileSelect.innerHTML = '<option value="">Error loading data sources</option>';
+          }
+        }
 
         searchForm.addEventListener("submit", (event) => {
           event.preventDefault(); // Prevent default form submission
 
-          const dataFile = document.getElementById("data-file").value;
-
+          const dataFile = dataFileSelect.value;
           const searchTerm = searchBox.value.toLowerCase(); // Convert search term to lowercase
 
           if (!dataFile) {
@@ -148,7 +156,6 @@
             });
         });
 
-
         function fuzzySearch(searchTerm, data) {
           // Implement your fuzzy search logic here
           // This is a basic example using string search
@@ -161,7 +168,10 @@
           if (data.length === 0) {
             output = "<tr><td colspan='2'>No results found, perhaps try a different data source</td></tr>";
           } else {
-            data.forEach(item => {
+            // Sort by index in ascending order (low to high)
+            const sortedData = data.sort((a, b) => a.index - b.index);
+            
+            sortedData.forEach(item => {
               output += `<tr>
                 <td>${item.index}</td>
                 <td>${item.label}</td>
@@ -199,7 +209,6 @@
             .catch(err => {
               console.error("Failed to copy index:", err);
             });
-
         });
 
         // Style the modal (optional)

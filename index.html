@@ -3,230 +3,592 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Runescape Model Search</title>
+    <title>RSHD Model Search</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-      /* Global styles */
+      :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --secondary: #8b5cf6;
+        --accent: #06b6d4;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --error: #ef4444;
+        --bg-primary: #0f172a;
+        --bg-secondary: #1e293b;
+        --bg-tertiary: #334155;
+        --surface: #475569;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --border: #334155;
+        --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --glass: rgba(255, 255, 255, 0.1);
+        --glass-border: rgba(255, 255, 255, 0.2);
+      }
+
       * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
-        font-family: sans-serif;
       }
+
       body {
-        background-color: #212529;
-        color: #fff;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(135deg, var(--bg-primary) 0%, #1e293b 50%, #0f172a 100%);
+        color: var(--text-primary);
+        min-height: 100vh;
+        overflow-x: hidden;
       }
-      .container {
-        max-width: 800px;
-        margin: 2rem auto;
-        padding: 1rem;
-        background-color: #343a40;
-        border-radius: 10px;
-      }
-      /* Form styles */
-      form {
-        display: flex;
-        gap: 1rem; /* Maintain gap between elements */
-        padding: 1rem; /* Add padding to the form */
-      }
-      label {
-        flex-shrink: 0; /* Prevent label from shrinking */
-        margin-right: 0.5rem; /* Add some space between label and select */
-        text-align: right;
-        line-height: 2.5em; /* Vertically center label with select menu */
-      }
-      select,
-        input[type="text"] {
-        padding: 0.5em;
-        border: 1px solid #ddd;
-        border-radius: 5px;
+
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
         width: 100%;
+        height: 100%;
+        background: 
+          radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: -1;
       }
-      button {
-        padding: 0.5em 1em;
-        background-color: #4CAF50;
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 3rem;
+        position: relative;
+      }
+
+      .header::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+        opacity: 0.1;
+        border-radius: 50%;
+        z-index: -1;
+      }
+
+      .header h1 {
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.025em;
+      }
+
+      .header p {
+        color: var(--text-secondary);
+        font-size: 1.125rem;
+        font-weight: 400;
+      }
+
+      .search-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow);
+        transition: all 0.3s ease;
+      }
+
+      .search-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.35);
+      }
+
+      .search-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 1rem;
+        align-items: end;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .form-label {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        font-weight: 500;
+        letter-spacing: 0.025em;
+        text-transform: uppercase;
+      }
+
+      .form-input, .form-select {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 0.875rem 1rem;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .form-input:focus, .form-select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .form-input::placeholder {
+        color: var(--text-muted);
+      }
+
+      .form-select option {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+      }
+
+      .search-btn {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
         color: white;
         border: none;
-        border-radius: 5px;
+        border-radius: 12px;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
         cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.3);
+        height: fit-content;
       }
-      /* Loading indicator */
-      .loading {
-        color: #ffc107;
-        font-style: italic;
+
+      .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px 0 rgba(99, 102, 241, 0.4);
       }
-      /* Table styles */
-      table {
+
+      .search-btn:active {
+        transform: translateY(0);
+      }
+
+      .results-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        animation: slideUp 0.6s ease;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .results-header {
+        background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--surface) 100%);
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .results-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+      }
+
+      .results-table {
         width: 100%;
         border-collapse: collapse;
+        background: transparent;
       }
-      th,
-      td {
-        padding: 0.5em;
-        border: 1px solid #444;
+
+      .results-table th {
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 1rem 1.5rem;
         text-align: left;
+        border-bottom: 1px solid var(--border);
       }
-      th {
-         background-color: #29323a;
+
+      .results-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--text-primary);
+        transition: all 0.2s ease;
+        cursor: pointer;
       }
-      .header {
-        background-color: #343a40;
+
+      .results-table tr:hover td {
+        background: rgba(99, 102, 241, 0.1);
+        transform: scale(1.01);
+      }
+
+      .results-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .index-cell {
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-weight: 600;
+        color: var(--accent);
+        min-width: 100px;
+      }
+
+      .label-cell {
+        font-weight: 500;
+      }
+
+      .loading-state {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--warning);
+        font-weight: 500;
+      }
+
+      .loading-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid transparent;
+        border-top: 2px solid var(--warning);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .copy-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.8);
+        background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
         color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        z-index: 1000;
+        opacity: 0;
+        animation: popIn 0.3s ease forwards;
+      }
+
+      @keyframes popIn {
+        to {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1);
+        }
+      }
+
+      .empty-state {
         text-align: center;
-        padding: 1rem;
+        padding: 3rem 1rem;
+        color: var(--text-muted);
+      }
+
+      .empty-state svg {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem;
+        }
+
+        .search-form {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+
+        .search-card {
+          padding: 1.5rem;
+        }
+
+        .results-table th,
+        .results-table td {
+          padding: 0.75rem 1rem;
+        }
+      }
+
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
       }
     </style>
   </head>
   <body>
-    <div class="header">
-      <h1>RSHD Model Search</h1>
-    </div>
     <div class="container">
-      <form>
-        <select id="data-file" name="data-file" required>
-          <option value="">Loading data sources...</option>
-        </select>
-        <input type="text" id="search-box" placeholder="Search models">
-        <button type="submit">Search</button>
-      </form>
-      <div class="results">
-        <table>
-          <thead>
-            <tr>
-              <th>Index</th>
-              <th>Label</th>
-            </tr>
-          </thead>
-          <tbody id="results-body"></tbody>
-        </table>
+      <header class="header">
+        <h1>RSHD Model Search</h1>
+        <p>Query a dataset for runescape model IDs</p>
+      </header>
+
+      <div class="search-card">
+        <form class="search-form" id="search-form">
+          <div class="form-group">
+            <label class="form-label" for="data-file">Data Source</label>
+            <select class="form-select" id="data-file" name="data-file" required>
+              <option value="">Loading data sources...</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="search-box">Search Term</label>
+            <input 
+              type="text" 
+              class="form-input" 
+              id="search-box" 
+              placeholder="Enter model name..."
+              autocomplete="off"
+            >
+          </div>
+
+          <button type="submit" class="search-btn">
+            Search
+          </button>
+        </form>
       </div>
-      <script>
-        const searchForm = document.querySelector("form");
-        const resultsBody = document.getElementById("results-body");
-        const searchBox = document.getElementById("search-box");
-        const dataFileSelect = document.getElementById("data-file");
 
-        // Load available data sources on page load
-        document.addEventListener('DOMContentLoaded', loadDataSources);
-
-        async function loadDataSources() {
-          try {
-            // Fetch the index file that contains list of available data files
-            const response = await fetch('data/index.json');
-            const dataSources = await response.json();
-            
-            // Clear the loading option
-            dataFileSelect.innerHTML = '<option value="">Select data source</option>';
-            
-            // Populate dropdown with available data sources
-            dataSources.forEach(source => {
-              const option = document.createElement('option');
-              option.value = source.value;
-              option.textContent = source.label || source.value;
-              dataFileSelect.appendChild(option);
-            });
-            
-          } catch (error) {
-            console.error('Error loading data sources:', error);
-            dataFileSelect.innerHTML = '<option value="">Error loading data sources</option>';
-          }
-        }
-
-        searchForm.addEventListener("submit", (event) => {
-          event.preventDefault(); // Prevent default form submission
-
-          const dataFile = dataFileSelect.value;
-          const searchTerm = searchBox.value.toLowerCase(); // Convert search term to lowercase
-
-          if (!dataFile) {
-            alert("Please select a data file.");
-            return;
-          }
-
-          const filename = `data/${dataFile}.json`; // Construct filename based on selection
-          fetch(filename)
-            .then(response => response.json())
-            .then(data => {
-              const results = fuzzySearch(searchTerm, data);
-              displayData(results);
-            })
-            .catch(error => {
-              console.error("Error fetching data:", error);
-              alert(`Failed to retrieve data, data file ${dataFile} may not exist.`);
-            });
-        });
-
-        function fuzzySearch(searchTerm, data) {
-          // Implement your fuzzy search logic here
-          // This is a basic example using string search
-          // Replace with a fuzzy search library like Fuse.js
-          return data.filter(item => item.label.toLowerCase().includes(searchTerm));
-        }
-
-        function displayData(data) {
-          let output = "";
-          if (data.length === 0) {
-            output = "<tr><td colspan='2'>No results found, perhaps try a different data source</td></tr>";
-          } else {
-            // Sort by index in ascending order (low to high)
-            const sortedData = data.sort((a, b) => a.index - b.index);
-            
-            sortedData.forEach(item => {
-              output += `<tr>
-                <td>${item.index}</td>
-                <td>${item.label}</td>
-            </tr>`;
-            });
-          }
-          resultsBody.innerHTML = output;
-        }
-
-        // Function to create and display the modal popup
-        function showCopySuccessModal(indexValue) {
-          const modal = document.createElement("div");
-          modal.classList.add("copy-success-modal");
-          modal.textContent = `Index ${indexValue} Copied!`;
-          document.body.appendChild(modal);
-
-          // Automatically remove the modal after 2 seconds
-          setTimeout(() => {
-            modal.remove();
-          }, 2000);
-        }
-
-        resultsBody.addEventListener("click", (event) => {
-          const target = event.target;
-          if (target.tagName !== "TD") return; // Check if clicked element is a table cell (TD)
-
-          // Get the index value from the cell content
-          const indexValue = target.textContent;
-
-          // Use the Clipboard API to copy the index value
-          navigator.clipboard.writeText(indexValue)
-            .then(() => { // No argument needed here
-              showCopySuccessModal(indexValue);
-            })
-            .catch(err => {
-              console.error("Failed to copy index:", err);
-            });
-        });
-
-        // Style the modal (optional)
-        const style = document.createElement("style");
-        style.textContent = `.copy-success-modal {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: #2ECC71;
-        color: white;
-        padding: 1rem;
-        border-radius: 5px;
-        font-size: 1.2rem;
-        z-index: 999; /* Ensure modal appears above other elements */
-        }`;
-        document.head.appendChild(style);
-      </script>
+      <div class="results-card" id="results-card" style="display: none;">
+        <div class="results-header">
+          <h2 class="results-title">Search Results</h2>
+        </div>
+        <div class="results-content">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Index</th>
+                <th>Label</th>
+              </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
+
+    <script>
+      const searchForm = document.getElementById("search-form");
+      const resultsBody = document.getElementById("results-body");
+      const resultsCard = document.getElementById("results-card");
+      const searchBox = document.getElementById("search-box");
+      const dataFileSelect = document.getElementById("data-file");
+
+      // Load available data sources on page load
+      document.addEventListener('DOMContentLoaded', loadDataSources);
+
+      async function loadDataSources() {
+        try {
+          const response = await fetch('data/index.json');
+          const dataSources = await response.json();
+          
+          dataFileSelect.innerHTML = '<option value="">Select data source</option>';
+          
+          dataSources.forEach(source => {
+            const option = document.createElement('option');
+            option.value = source.value;
+            option.textContent = source.label || source.value;
+            dataFileSelect.appendChild(option);
+          });
+          
+        } catch (error) {
+          console.error('Error loading data sources:', error);
+          dataFileSelect.innerHTML = '<option value="">Error loading data sources</option>';
+        }
+      }
+
+      searchForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const dataFile = dataFileSelect.value;
+        const searchTerm = searchBox.value.toLowerCase();
+
+        if (!dataFile) {
+          showNotification("Please select a data source", "warning");
+          return;
+        }
+
+        // Show loading state
+        showLoadingState();
+        resultsCard.style.display = 'block';
+
+        try {
+          const response = await fetch(`data/${dataFile}.json`);
+          const data = await response.json();
+          const results = fuzzySearch(searchTerm, data);
+          displayData(results);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          showErrorState(`Failed to retrieve data from ${dataFile}`);
+        }
+      });
+
+      function fuzzySearch(searchTerm, data) {
+        if (!searchTerm) return data;
+        return data.filter(item => 
+          item.label.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      function displayData(data) {
+        if (data.length === 0) {
+          showEmptyState();
+          return;
+        }
+
+        const sortedData = data.sort((a, b) => a.index - b.index);
+        
+        let output = "";
+        sortedData.forEach(item => {
+          output += `
+            <tr class="result-row" data-index="${item.index}">
+              <td class="index-cell">${item.index}</td>
+              <td class="label-cell">${item.label}</td>
+            </tr>
+          `;
+        });
+        
+        resultsBody.innerHTML = output;
+      }
+
+      function showLoadingState() {
+        resultsBody.innerHTML = `
+          <tr>
+            <td colspan="2" class="loading-state">
+              <div class="loading-spinner"></div>
+              Loading results...
+            </td>
+          </tr>
+        `;
+      }
+
+      function showEmptyState() {
+        resultsBody.innerHTML = `
+          <tr>
+            <td colspan="2" class="empty-state">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33"/>
+              </svg>
+              <div>No results found</div>
+              <div style="font-size: 0.875rem; margin-top: 0.5rem;">Try a different search term or data source</div>
+            </td>
+          </tr>
+        `;
+      }
+
+      function showErrorState(message) {
+        resultsBody.innerHTML = `
+          <tr>
+            <td colspan="2" class="empty-state" style="color: var(--error);">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <div>Error</div>
+              <div style="font-size: 0.875rem; margin-top: 0.5rem;">${message}</div>
+            </td>
+          </tr>
+        `;
+      }
+
+      function showCopyModal(indexValue) {
+        const modal = document.createElement("div");
+        modal.className = "copy-modal";
+        modal.textContent = `Index ${indexValue} copied!`;
+        document.body.appendChild(modal);
+
+        setTimeout(() => {
+          modal.remove();
+        }, 2000);
+      }
+
+      function showNotification(message, type = "info") {
+        // Simple notification system
+        const notification = document.createElement("div");
+        notification.className = "copy-modal";
+        notification.style.background = type === "warning" ? 
+          "linear-gradient(135deg, var(--warning) 0%, #e68900 100%)" :
+          "linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)";
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      }
+
+      // Click to copy functionality
+      resultsBody.addEventListener("click", (event) => {
+        const row = event.target.closest('.result-row');
+        if (!row) return;
+
+        const indexValue = row.dataset.index;
+        
+        navigator.clipboard.writeText(indexValue)
+          .then(() => {
+            showCopyModal(indexValue);
+          })
+          .catch(err => {
+            console.error("Failed to copy index:", err);
+            showNotification("Failed to copy to clipboard", "warning");
+          });
+      });
+
+      // Add smooth animations for form interactions
+      [dataFileSelect, searchBox].forEach(input => {
+        input.addEventListener('focus', function() {
+          this.parentElement.style.transform = 'translateY(-2px)';
+        });
+        
+        input.addEventListener('blur', function() {
+          this.parentElement.style.transform = 'translateY(0)';
+        });
+      });
+    </script>
   </body>
 </html>
